@@ -1,3 +1,6 @@
+# Install if not done
+# pip install transformers langchain flask
+
 from flask import Flask, render_template, request, jsonify
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 
@@ -10,8 +13,8 @@ pipe = pipeline(
     "text2text-generation",
     model=model,
     tokenizer=tokenizer,
-    device=-1,  # CPU
-    max_new_tokens=150,  # short output
+    device=-1,  # CPU, change to 0 for GPU
+    max_new_tokens=150,  # keep output short
 )
 
 # --- Load website text and split into chunks ---
@@ -23,34 +26,12 @@ def load_chunks(file_path, chunk_size=500):
 
 website_chunks = load_chunks("website_text.txt")
 
-# --- Query function ---
+# --- Query function with chunked context ---
 def query_llm(question):
-    greetings = ["hi", "hello", "hey", "good morning", "good evening"]
-    if question.lower().strip() in greetings:
-        return "Hello! I’m Mr. Landon, your hotel assistant. How can I help you today?"
-
-    # Use first 3 chunks as context (~1500 tokens)
-    context = " ".join(website_chunks[:3])
-    
-    prompt = f"""
-You are Mr. Landon, the manager of Landon Hotel in London. 
-Answer all questions briefly and politely. 
-If a question is not about the hotel or your role, respond: "I can't assist you with that, sorry!"
-
-Context:
-{context}
-
-Examples:
-Q: What is your name?
-A: I’m Mr. Landon, the manager of Landon Hotel.
-Q: What is the hotel name?
-A: The hotel is called Landon Hotel.
-
-
-Now answer this question briefly:
-Q: {question}
-A:
-"""
+    # Find the chunk most relevant to the question
+    # For simplicity, we just concatenate first few chunks (small memory usage)
+    context = " ".join(website_chunks[:3])  # use first 3 chunks (~1500 tokens)
+    prompt = f"{context}\n\nYou are the hotel manager of Landon Hotel, named 'Mr. Landon'. You only answer questions about Landon Hotel. If a question is not about Landon Hotel, respond with: 'I can't assist you with that, sorry!'\n\nQuestion: {question}\nAnswer:"
     result = pipe(prompt)
     return result[0]['generated_text'].strip()
 
