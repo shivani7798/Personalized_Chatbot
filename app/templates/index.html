@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Landon Hotel Chatbot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .chat-wrapper {
+    width: 380px;
+    height: 550px;
+    background: #ffffff;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    overflow: hidden;
+  }
+
+  .chat-header {
+    padding: 16px;
+    background: #1f2933;
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .chat-body {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    background: #f7f9fc;
+  }
+
+  .message {
+    max-width: 75%;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .user {
+    background: #2563eb;
+    color: #fff;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+  }
+
+  .bot {
+    background: #e5e7eb;
+    color: #111827;
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+  }
+
+  .typing {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 10px;
+  }
+
+  .chat-input {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+  }
+
+  .chat-input input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    outline: none;
+    font-size: 14px;
+  }
+
+  .chat-input button {
+    margin-left: 8px;
+    padding: 10px 16px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .chat-input button:hover {
+    background: #1d4ed8;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="chat-wrapper">
+  <div class="chat-header">🏨 Landon Hotel Assistant</div>
+
+  <div class="chat-body" id="chat"></div>
+
+  <div class="chat-input">
+    <input id="input" placeholder="Ask about rooms, dining, or amenities…" />
+    <button onclick="send()">Send</button>
+  </div>
+</div>
+
+<script>
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("input");
+
+  function addMessage(text, cls) {
+    const div = document.createElement("div");
+    div.className = `message ${cls}`;
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function addTyping() {
+    const div = document.createElement("div");
+    div.className = "typing";
+    div.id = "typing";
+    div.textContent = "Mr. Landon is typing…";
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById("typing");
+    if (t) t.remove();
+  }
+
+  async function send() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    input.value = "";
+
+    addTyping();
+
+    try {
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: text })
+      });
+
+      const data = await res.json();
+      removeTyping();
+      addMessage(data.response, "bot");
+    } catch (e) {
+      removeTyping();
+      addMessage("Sorry, something went wrong.", "bot");
+    }
+  }
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") send();
+  });
+
+  // Initial greeting
+  addMessage("Hello! I’m Mr. Landon. How can I help you today?", "bot");
+</script>
+
+</body>
+</html>

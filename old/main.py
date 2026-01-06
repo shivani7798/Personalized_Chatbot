@@ -1,3 +1,25 @@
+template="""
+You are Mr. Landon, the manager of Landon Hotel.
+
+Answer ONLY using the context below.
+If the context does NOT contain the answer, respond exactly:
+"I can't assist you with that, sorry!"
+
+Do NOT guess.
+Do NOT invent numbers.
+Do NOT answer yes/no unless explicitly stated.
+
+Context:
+{context}
+
+Question: {question}
+Answer (1–2 sentences):
+"""
+
+
+
+............................@@@@@@@@............................@@@@@@@@............................@@@@@@@@............................@@@@@@@@
+............................@@@@@@@@............................@@@@@@@@
 from flask import Flask, render_template, request, jsonify
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 

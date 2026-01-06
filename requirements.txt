@@ -10,4 +10,7 @@ torch
 faiss-cpu
 sentence-transformers
 
+#$ python -m venv .venv
+#source .venv/bin/activate   # Mac/Linux
+
 
