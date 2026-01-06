@@ -12,11 +12,20 @@ from app.config import (
     CHUNK_OVERLAP,
     TOP_K,
 )
+FAISS_PATH = "artifacts/faiss_index"
 
-# ------------------------
-# Vector Store
-# ------------------------
 def load_vectorstore(file_path: str):
+    embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+
+    if os.path.exists(FAISS_PATH):
+        print("✅ Loading existing FAISS index...")
+        return FAISS.load_local(
+            FAISS_PATH,
+            embeddings,
+            allow_dangerous_deserialization=True
+        )
+
+    print("🔨 Building FAISS index (first run only)...")
     with open(file_path, "r", encoding="utf-8") as f:
         text = f.read()
 
@@ -26,9 +35,13 @@ def load_vectorstore(file_path: str):
     )
 
     docs = splitter.create_documents([text])
+    vectorstore = FAISS.from_documents(docs, embeddings)
 
-    embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
-    return FAISS.from_documents(docs, embeddings)
+    os.makedirs("artifacts", exist_ok=True)
+    vectorstore.save_local(FAISS_PATH)
+
+    print("💾 FAISS index saved to disk")
+    return vectorstore
 
 # ------------------------
 # RAG Chain Factory

@@ -1,0 +1,62 @@
+# ------------------------
+# Python
+# ------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+.pytest_cache/
+
+# ------------------------
+# Virtual environments
+# ------------------------
+.venv/
+venv/
+env/
+
+# ------------------------
+# Git
+# ------------------------
+.git/
+.gitignore
+
+# ------------------------
+# OS / Editor
+# ------------------------
+.DS_Store
+.vscode/
+.idea/
+
+# ------------------------
+# Logs & temp
+# ------------------------
+*.log
+tmp/
+.cache/
+
+# ------------------------
+# Large local artifacts (DO NOT IGNORE FAISS)
+# ------------------------
+# models/
+# checkpoints/
+
+# ------------------------
+# Node (if any)
+# ------------------------
+node_modules/
+
+# ------------------------
+# Docker junk
+# ------------------------
+Dockerfile.old
+docker-compose.yml
+
+# ------------------------
+# IMPORTANT
+# ------------------------
+# DO NOT IGNORE:
+# artifacts/        <-- FAISS index lives here
+# data/             <-- your website text
+# app/              <-- core code
